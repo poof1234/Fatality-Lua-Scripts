@@ -251,7 +251,7 @@ local function draw_hud()
             break;
         end
 
-        render:text(create_small_font, screen_size.x / 2 - 945, screen_size.y / 2 - 508 + index * 12, ''.. client_message_sent_by_name[index] ..': '.. client_message[index] ..'', csgo.color(255, 255, 255, 255));
+        render:text(create_small_font, screen_size.x / 2 - 945, screen_size.y / 2 - 510 + index * 12, ''.. client_message_sent_by_name[index] ..': '.. client_message[index] ..'', csgo.color(255, 255, 255, 255));
     end
 
     for index = 0, client_kill_message_index, 1 do
@@ -259,7 +259,7 @@ local function draw_hud()
             break;
         end
 
-        render:text(create_small_font, screen_size.x / 2 + 435, screen_size.y / 2 - 508 + index * 12, ''.. client_killed_by_name[index] ..' killed '.. client_killed_name[index] ..' with their '.. client_killed_by_weapon[index] ..'', csgo.color(255, 255, 255, 255));
+        render:text(create_small_font, screen_size.x / 2 + 435, screen_size.y / 2 - 510 + index * 12, ''.. client_killed_by_name[index] ..' killed '.. client_killed_name[index] ..' with their '.. client_killed_by_weapon[index] ..'', csgo.color(255, 255, 255, 255));
     end
 
     local local_player = entity_list:get_localplayer(); 
@@ -297,13 +297,13 @@ local function draw_hud()
     end
 
     render:text(create_large_font, screen_size.x / 2 - 945, screen_size.y / 2 + 510, 'Player: '.. local_player_name ..' | Ping: '.. local_player_ping ..' | Round Kills: '.. local_player_round_kills ..' | Current Map: '.. map_name(local_player_map_name) ..'', csgo.color(255, 255, 255, 255));
-    render:rect_fade(screen_size.x / 2 + 420, screen_size.y / 2 - 8, screen_size.x / 2 - 420, screen_size.y / 2 - 500, csgo.color(10, 10, 10, 240), csgo.color(30, 30, 30, 240));
-    render:rect(screen_size.x / 2 + 420, screen_size.y / 2 - 8, screen_size.x / 2 - 420, screen_size.y / 2 - 500, csgo.color(255, 255, 255, 240));
+    render:rect_fade(screen_size.x / 2 - 275, screen_size.y / 2 + 500, screen_size.x / 2 - 420, screen_size.y / 2 - 500, csgo.color(10, 10, 10, 240), csgo.color(30, 30, 30, 240));
+    render:rect(screen_size.x / 2 - 275, screen_size.y / 2 + 500, screen_size.x / 2 - 420, screen_size.y / 2 - 500, csgo.color(255, 255, 255, 240));
 
     if local_player_ammo_clip == -1 then
-        render:text(create_large_font, screen_size.x / 2 + 435, screen_size.y / 2, 'Ammo: Infinite | Current Weapon: '.. weapon_name(local_player_weapon_id) ..'', csgo.color(255, 255, 255, 255));
+        render:text(create_large_font, screen_size.x / 2 - 260, screen_size.y / 2 + 510, 'Ammo: Infinite | Current Weapon: '.. weapon_name(local_player_weapon_id) ..'', csgo.color(255, 255, 255, 255));
     else
-        render:text(create_large_font, screen_size.x / 2 + 435, screen_size.y / 2, 'Ammo: '.. local_player_ammo_clip ..'/'.. local_player_ammo_reserved ..' | Current Weapon: '.. weapon_name(local_player_weapon_id) ..'', csgo.color(255, 255, 255, 255));
+        render:text(create_large_font, screen_size.x / 2 - 260, screen_size.y / 2 + 510, 'Ammo: '.. local_player_ammo_clip ..'/'.. local_player_ammo_reserved ..' | Current Weapon: '.. weapon_name(local_player_weapon_id) ..'', csgo.color(255, 255, 255, 255));
     end
 
     render:rect_fade(screen_size.x / 2 + 420, screen_size.y / 2 + 500, screen_size.x / 2 - 420, screen_size.y / 2 - 500, csgo.color(10, 10, 10, 240), csgo.color(30, 30, 30, 240));
