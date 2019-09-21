@@ -92,7 +92,7 @@ local function map_name(map)
     elseif map == 'maps\\gd_rialto.bsp' then
         return 'Rialto';
     else
-        return 'Unknown Map';
+        return 'Unknown';
     end
 end
 
@@ -230,7 +230,7 @@ local function weapon_name(weapon)
     elseif weapon == 523 then
         return 'Talon Knife';
     else
-        return 'Unknown Weapon';
+        return 'Unknown';
     end
 end
 
