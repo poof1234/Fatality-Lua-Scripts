@@ -8,7 +8,6 @@ local custom_ui_checkbox = menu:add_checkbox('Custom UI', 'Visuals', 'Misc', 'Va
 
 local engine_client = csgo.interface_handler:get_engine_client();
 local entity_list = csgo.interface_handler:get_entity_list();
-local global_vars = csgo.interface_handler:get_global_vars();
 local cvar = csgo.interface_handler:get_cvar();
 local events = csgo.interface_handler:get_events();
 
@@ -30,7 +29,7 @@ local client_killed_by_weapon = {};
 local client_message_index = 0;
 local client_kill_message_index = 0;
 
-function reset_fields()
+local function reset_fields()
     client_killed_by_name = {};
     client_killed_name = {};
     client_killed_by_weapon = {};
@@ -40,7 +39,7 @@ function reset_fields()
     client_message_index = 0;
 end
 
-function weapon_name(weapon)
+local function weapon_name(weapon)
     if weapon == 1 then
         return 'Desert Eagle';
     elseif weapon == 2 then
@@ -178,29 +177,29 @@ function weapon_name(weapon)
     end
 end
 
-function draw_top_left_hud(index)
+local function draw_top_left_hud(index)
     render:rect_filled(0, screen_size.y / 2 - 540, screen_size.x / 2 - 420, screen_size.y / 2 - 495 + index * 15, csgo.color(10, 10, 10, 240));
     render:rect(0, screen_size.y / 2 - 540, screen_size.x / 2 - 420, 1, csgo.color(180, 180, 180, 240));
     render:text(create_icon_font, screen_size.x / 2 - 945, screen_size.y / 2 - 526, 'x', csgo.color(180, 180, 180, 240));
     render:text(create_large_font, screen_size.x / 2 - 918, screen_size.y / 2 - 528, 'Server messages', csgo.color(180, 180, 180, 240));
 end
 
-function draw_top_left_information(index, sender, message)
+local function draw_top_left_information(index, sender, message)
     render:text(create_small_font, screen_size.x / 2 - 945, screen_size.y / 2 - 502 + index * 15, ''.. sender ..': '.. message ..'', csgo.color(180, 180, 180, 240));
 end
 
-function draw_top_right_hud(index)
+local function draw_top_right_hud(index)
     render:rect_filled(screen_size.x / 2 + 420, screen_size.y / 2 - 540, screen_size.x / 2 - 420, screen_size.y / 2 - 495 + index * 15, csgo.color(10, 10, 10, 240));
     render:rect(screen_size.x / 2 + 420, screen_size.y / 2 - 540, screen_size.x / 2 - 420, 1, csgo.color(180, 180, 180, 240));
     render:text(create_icon_font, screen_size.x / 2 + 435, screen_size.y / 2 - 526, 'w', csgo.color(180, 180, 180, 240));
     render:text(create_large_font, screen_size.x / 2 + 462, screen_size.y / 2 - 528, 'Kill messages', csgo.color(180, 180, 180, 240));
 end
 
-function draw_top_right_information(index, killer, killed, weapon)
+local function draw_top_right_information(index, killer, killed, weapon)
     render:text(create_small_font, screen_size.x / 2 + 435, screen_size.y / 2 - 502 + index * 15, ''.. killer ..' killed '.. killed ..' with their '.. weapon ..'', csgo.color(180, 180, 180, 240));
 end
 
-function draw_bottom_left_hud(health_amount, armor_amount, round_kills_amount, ping_amount)
+local function draw_bottom_left_hud(health_amount, armor_amount, round_kills_amount, ping_amount)
     render:rect_filled(0, screen_size.y / 2 + 495, screen_size.x / 2 - 420, screen_size.y / 2 - 495, csgo.color(10, 10, 10, 240));
     render:rect(0, screen_size.y / 2 + 495, screen_size.x / 2 - 420, 1, csgo.color(180, 180, 180, 240));
     render:text(create_icon_font, screen_size.x / 2 - 945, screen_size.y / 2 + 510, 'p', csgo.color(180, 180, 180, 240));
@@ -236,7 +235,7 @@ function draw_bottom_left_hud(health_amount, armor_amount, round_kills_amount, p
     end
 end
 
-function draw_bottom_right_hud(weapon_name, weapon_current_ammo, weapon_ammo_clip)
+local function draw_bottom_right_hud(weapon_name, weapon_current_ammo, weapon_ammo_clip)
     render:rect_filled(screen_size.x / 2 + 420, screen_size.y / 2 + 495, screen_size.x / 2 - 420, screen_size.y / 2 - 495, csgo.color(10, 10, 10, 240));
     render:rect(screen_size.x / 2 + 420, screen_size.y / 2 + 495, screen_size.x / 2 - 420, 1, csgo.color(180, 180, 180, 240));
 
@@ -247,7 +246,7 @@ function draw_bottom_right_hud(weapon_name, weapon_current_ammo, weapon_ammo_cli
     end
 end
 
-function draw_hud()
+local function draw_hud()
     if client_message_index == nil or client_kill_message_index == nil then
         return;
     end
@@ -300,12 +299,12 @@ function draw_hud()
     draw_bottom_right_hud(weapon_name(local_player_weapon_id), local_player_ammo_clip, local_player_ammo_reserved);
 end
 
-function draw_crosshair()
+local function draw_crosshair()
     render:rect_filled(screen_size.x / 2 - 10, screen_size.y / 2, 20, 1, csgo.color(255, 255, 255, 255));
     render:rect_filled(screen_size.x / 2, screen_size.y / 2 - 10, 1, 20, csgo.color(255, 255, 255, 255));
 end
 
-function on_paint()
+local function on_paint()
     if not engine_client:is_connected() and not engine_client:is_in_game() then
         return;
     end
@@ -325,7 +324,7 @@ function on_paint()
     end
 end
 
-function on_events(event)
+local function on_events(event)
     if not engine_client:is_connected() and not engine_client:is_in_game() then
         return;
     end
