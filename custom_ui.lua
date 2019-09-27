@@ -30,7 +30,7 @@ local client_killed_by_weapon = {};
 local client_message_index = 0;
 local client_kill_message_index = 0;
 
-function reset_tables()
+function reset_fields()
     client_killed_by_name = {};
     client_killed_name = {};
     client_killed_by_weapon = {};
@@ -380,11 +380,11 @@ function on_events(event)
     end
 
     if event:get_name() == 'player_disconnect' then
-        reset_tables();
+        reset_fields();
     end
 
     if event:get_name() == 'round_start' then
-        reset_tables();
+        reset_fields();
     end
 end
 
