@@ -20,18 +20,18 @@ local create_icon_font = render:create_font('custom_csgo_icons', 18, 300, true);
 local players_name = {};
 local players_index = 0;
 
-function draw_spectator_list(position_x, position_y, position_w, position_h, index)
+local function draw_spectator_list(position_x, position_y, position_w, position_h, index)
     render:rect_filled(position_x + 5, position_y + 2, position_w - 10, position_h - 12 + index * 15, csgo.color(10, 10, 10, 240));
     render:rect(position_x + 5, position_y + 2, position_w - 10, 1, csgo.color(180, 180, 180, 240));
     render:text(create_icon_font, position_x + position_w - 230, position_y + 12, 't', csgo.color(190, 190, 190, 240));
     render:text(create_large_font, position_x + position_w - 205, position_y + 10, 'Current spectators', csgo.color(190, 190, 190, 240));
 end
 
-function draw_spectators(position_x, position_y, index, text)
+local function draw_spectators(position_x, position_y, index, text)
     render:text(create_small_font, position_x + 18, position_y + 36 + index * 15, text, csgo.color(190, 190, 190, 240));
 end
 
-function on_paint()
+local function on_paint()
     if not spectator_list_item:get_bool() then
         return;
     end
