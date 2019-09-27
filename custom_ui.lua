@@ -8,6 +8,7 @@ local custom_ui_checkbox = menu:add_checkbox('Custom UI', 'Visuals', 'Misc', 'Va
 
 local engine_client = csgo.interface_handler:get_engine_client();
 local entity_list = csgo.interface_handler:get_entity_list();
+local global_vars = csgo.interface_handler:get_global_vars();
 local cvar = csgo.interface_handler:get_cvar();
 local events = csgo.interface_handler:get_events();
 
@@ -18,6 +19,7 @@ local event_round_start = events:add_event('round_start');
 
 local create_large_font = render:create_font('Tahoma', 20, 300, true);
 local create_small_font = render:create_font('Tahoma', 12, 300, true);
+local create_icon_font = render:create_font('custom_csgo_icons', 18, 300, true);
 local screen_size = render:screen_size();
 
 local client_message_sent_by_name = {};
@@ -28,75 +30,17 @@ local client_killed_by_weapon = {};
 local client_message_index = 0;
 local client_kill_message_index = 0;
 
-local function map_name(map)
-    if map == 'maps\\ar_baggage.bsp' then
-        return 'Baggage';
-    elseif map == 'maps\\ar_dizzy.bsp' then
-        return 'Dizzy';
-    elseif map == 'maps\\ar_monastery.bsp' then
-        return 'Monastery';
-    elseif map == 'maps\\ar_shoots.bsp' then
-        return 'Shoots';
-    elseif map == 'maps\\cs_agency.bsp' then
-        return 'Agency';
-    elseif map == 'maps\\cs_assault.bsp' then
-        return 'Assault';
-    elseif map == 'maps\\cs_italy.bsp' then
-        return 'Italy';
-    elseif map == 'maps\\cs_militia.bsp' then
-        return 'Militia';
-    elseif map == 'maps\\cs_office.bsp' then
-        return 'Office';
-    elseif map == 'maps\\de_bank.bsp' then
-        return 'Bank';
-    elseif map == 'maps\\de_breach.bsp' then
-        return 'Breach';
-    elseif map == 'maps\\de_cache.bsp' then
-        return 'Cache';
-    elseif map == 'maps\\de_canals.bsp' then
-        return 'Canals';
-    elseif map == 'maps\\de_cbble.bsp' then
-        return 'Cobblestone';
-    elseif map == 'maps\\de_dust2.bsp' then
-        return 'Dust 2';
-    elseif map == 'maps\\de_inferno.bsp' then
-        return 'Inferno';
-    elseif map == 'maps\\de_lake.bsp' then
-        return 'Lake';
-    elseif map == 'maps\\de_mirage.bsp' then
-        return 'Mirage';
-    elseif map == 'maps\\de_nuke.bsp' then
-        return 'Nuke';
-    elseif map == 'maps\\de_overpass.bsp' then
-        return 'Overpass';
-    elseif map == 'maps\\de_ruby.bsp' then
-        return 'Ruby';
-    elseif map == 'maps\\de_safehouse.bsp' then
-        return 'Safehouse';
-    elseif map == 'maps\\de_seaside.bsp' then
-        return 'Seaside';
-    elseif map == 'maps\\de_shortdust.bsp' then
-        return 'Shortdust';
-    elseif map == 'maps\\de_shortnuke.bsp' then
-        return 'Shortnuke';
-    elseif map == 'maps\\de_train.bsp' then
-        return 'Train';
-    elseif map == 'maps\\de_vertigo.bsp' then
-        return 'Vertigo';
-    elseif map == 'maps\\de_zoo.bsp' then
-        return 'Zoo';
-    elseif map == 'maps\\dz_blacksite.bsp' then
-        return 'Blacksite';
-    elseif map == 'maps\\dz_sirocco.bsp' then
-        return 'Sirocco';
-    elseif map == 'maps\\gd_rialto.bsp' then
-        return 'Rialto';
-    else
-        return 'Unknown';
-    end
+function reset_tables()
+    client_killed_by_name = {};
+    client_killed_name = {};
+    client_killed_by_weapon = {};
+    client_kill_message_index = 0;
+    client_message_sent_by_name = {};
+    client_message = {};
+    client_message_index = 0;
 end
 
-local function weapon_name(weapon)
+function weapon_name(weapon)
     if weapon == 1 then
         return 'Desert Eagle';
     elseif weapon == 2 then
@@ -234,24 +178,89 @@ local function weapon_name(weapon)
     end
 end
 
-local function draw_hud()
-    render:rect_fade(0, screen_size.y / 2 - 540, screen_size.x / 2 - 420, screen_size.y / 2 - 500 + client_message_index * 12, csgo.color(10, 10, 10, 240), csgo.color(30, 30, 30, 240));
-    render:rect(0, screen_size.y / 2 - 540, screen_size.x / 2 - 420, screen_size.y / 2 - 500 + client_message_index * 12, csgo.color(255, 255, 255, 240));
-    render:text(create_large_font, screen_size.x / 2 - 945, screen_size.y / 2 - 532, 'Client Messages', csgo.color(255, 255, 255, 255));
-    render:rect_fade(screen_size.x / 2 + 420, screen_size.y / 2 - 540, screen_size.x / 2 - 420, screen_size.y / 2 - 500 + client_kill_message_index * 12, csgo.color(10, 10, 10, 240), csgo.color(30, 30, 30, 240));
-    render:rect(screen_size.x / 2 + 420, screen_size.y / 2 - 540, screen_size.x / 2 - 420, screen_size.y / 2 - 500 + client_kill_message_index * 12, csgo.color(255, 255, 255, 240));
-    render:text(create_large_font, screen_size.x / 2 + 435, screen_size.y / 2 - 532, 'Kill Messages', csgo.color(255, 255, 255, 255));
+function draw_top_left_hud(index)
+    render:rect_filled(0, screen_size.y / 2 - 540, screen_size.x / 2 - 420, screen_size.y / 2 - 495 + index * 15, csgo.color(10, 10, 10, 240));
+    render:rect(0, screen_size.y / 2 - 540, screen_size.x / 2 - 420, 1, csgo.color(180, 180, 180, 240));
+    render:text(create_icon_font, screen_size.x / 2 - 945, screen_size.y / 2 - 526, 'x', csgo.color(180, 180, 180, 240));
+    render:text(create_large_font, screen_size.x / 2 - 918, screen_size.y / 2 - 528, 'Server messages', csgo.color(180, 180, 180, 240));
+end
 
+function draw_top_left_information(index, sender, message)
+    render:text(create_small_font, screen_size.x / 2 - 945, screen_size.y / 2 - 502 + index * 15, ''.. sender ..': '.. message ..'', csgo.color(180, 180, 180, 240));
+end
+
+function draw_top_right_hud(index)
+    render:rect_filled(screen_size.x / 2 + 420, screen_size.y / 2 - 540, screen_size.x / 2 - 420, screen_size.y / 2 - 495 + index * 15, csgo.color(10, 10, 10, 240));
+    render:rect(screen_size.x / 2 + 420, screen_size.y / 2 - 540, screen_size.x / 2 - 420, 1, csgo.color(180, 180, 180, 240));
+    render:text(create_icon_font, screen_size.x / 2 + 435, screen_size.y / 2 - 526, 'w', csgo.color(180, 180, 180, 240));
+    render:text(create_large_font, screen_size.x / 2 + 462, screen_size.y / 2 - 528, 'Kill messages', csgo.color(180, 180, 180, 240));
+end
+
+function draw_top_right_information(index, killer, killed, weapon)
+    render:text(create_small_font, screen_size.x / 2 + 435, screen_size.y / 2 - 502 + index * 15, ''.. killer ..' killed '.. killed ..' with their '.. weapon ..'', csgo.color(180, 180, 180, 240));
+end
+
+function draw_bottom_left_hud(health_amount, armor_amount, round_kills_amount, ping_amount)
+    render:rect_filled(0, screen_size.y / 2 + 495, screen_size.x / 2 - 420, screen_size.y / 2 - 495, csgo.color(10, 10, 10, 240));
+    render:rect(0, screen_size.y / 2 + 495, screen_size.x / 2 - 420, 1, csgo.color(180, 180, 180, 240));
+    render:text(create_icon_font, screen_size.x / 2 - 945, screen_size.y / 2 + 510, 'p', csgo.color(180, 180, 180, 240));
+
+    if health_amount == 0 then
+        render:text(create_large_font, screen_size.x / 2 - 918, screen_size.y / 2 + 508, 'Zero', csgo.color(180, 180, 180, 240));
+    else
+        render:text(create_large_font, screen_size.x / 2 - 918, screen_size.y / 2 + 508, health_amount, csgo.color(180, 180, 180, 240));
+    end
+
+    render:text(create_icon_font, screen_size.x / 2 - 868, screen_size.y / 2 + 510, 'q', csgo.color(180, 180, 180, 240));
+
+    if armor_amount == 0 then
+        render:text(create_large_font, screen_size.x / 2 - 841, screen_size.y / 2 + 508, 'Zero', csgo.color(180, 180, 180, 240));
+    else
+        render:text(create_large_font, screen_size.x / 2 - 841, screen_size.y / 2 + 508, armor_amount, csgo.color(180, 180, 180, 240));
+    end
+
+    render:text(create_icon_font, screen_size.x / 2 - 791, screen_size.y / 2 + 510, 's', csgo.color(180, 180, 180, 240));
+
+    if round_kills_amount == 0 then
+        render:text(create_large_font, screen_size.x / 2 - 764, screen_size.y / 2 + 508, 'Zero', csgo.color(180, 180, 180, 240));
+    else
+        render:text(create_large_font, screen_size.x / 2 - 764, screen_size.y / 2 + 508, round_kills_amount, csgo.color(180, 180, 180, 240));
+    end
+
+    render:text(create_icon_font, screen_size.x / 2 - 714, screen_size.y / 2 + 510, 'z', csgo.color(180, 180, 180, 240));
+
+    if ping_amount == 0 then
+        render:text(create_large_font, screen_size.x / 2 - 687, screen_size.y / 2 + 508, 'Locally hosted', csgo.color(180, 180, 180, 240));
+    else
+        render:text(create_large_font, screen_size.x / 2 - 687, screen_size.y / 2 + 508, ping_amount, csgo.color(180, 180, 180, 240));
+    end
+end
+
+function draw_bottom_right_hud(weapon_name, weapon_current_ammo, weapon_ammo_clip)
+    render:rect_filled(screen_size.x / 2 + 420, screen_size.y / 2 + 495, screen_size.x / 2 - 420, screen_size.y / 2 - 495, csgo.color(10, 10, 10, 240));
+    render:rect(screen_size.x / 2 + 420, screen_size.y / 2 + 495, screen_size.x / 2 - 420, 1, csgo.color(180, 180, 180, 240));
+
+    if weapon_current_ammo == -1 then
+        render:text(create_large_font, screen_size.x / 2 + 435, screen_size.y / 2 + 510, 'Weapon name: '.. weapon_name ..' | Weapon ammunition: infinite', csgo.color(180, 180, 180, 240));
+    else
+        render:text(create_large_font, screen_size.x / 2 + 435, screen_size.y / 2 + 510, 'Weapon name: '.. weapon_name ..' | Weapon ammunition: '.. weapon_current_ammo ..'/'.. weapon_ammo_clip ..'', csgo.color(180, 180, 180, 240));
+    end
+end
+
+function draw_hud()
     if client_message_index == nil or client_kill_message_index == nil then
         return;
     end
+
+    draw_top_left_hud(client_message_index);
+    draw_top_right_hud(client_kill_message_index);
 
     for index = 0, client_message_index, 1 do
         if client_message_sent_by_name[index] == nil or client_message[index] == nil then
             break;
         end
 
-        render:text(create_small_font, screen_size.x / 2 - 945, screen_size.y / 2 - 510 + index * 12, ''.. client_message_sent_by_name[index] ..': '.. client_message[index] ..'', csgo.color(255, 255, 255, 255));
+        draw_top_left_information(index, client_message_sent_by_name[index], client_message[index]);
     end
 
     for index = 0, client_kill_message_index, 1 do
@@ -259,7 +268,7 @@ local function draw_hud()
             break;
         end
 
-        render:text(create_small_font, screen_size.x / 2 + 435, screen_size.y / 2 - 510 + index * 12, ''.. client_killed_by_name[index] ..' killed '.. client_killed_name[index] ..' with their '.. client_killed_by_weapon[index] ..'', csgo.color(255, 255, 255, 255));
+        draw_top_right_information(index, client_killed_by_name[index], client_killed_name[index], client_killed_by_weapon[index]);
     end
 
     local local_player = entity_list:get_localplayer(); 
@@ -268,9 +277,7 @@ local function draw_hud()
         return;
     end
 
-    local local_player_name = local_player:get_name();
     local local_player_ping = engine_client:get_ping();
-    local local_player_map_name = engine_client:get_map_name();
     local local_player_round_kills = local_player:get_var_int('CCSPlayer->m_iNumRoundKills');
     local local_player_health = local_player:get_var_int('CBasePlayer->m_iHealth');
     local local_player_armor = local_player:get_var_int('CCSPlayer->m_ArmorValue');
@@ -285,38 +292,20 @@ local function draw_hud()
     local local_player_ammo_reserved = local_player_active_weapon:get_var_int('CBaseCombatWeapon->m_iPrimaryReserveAmmoCount');
     local local_player_weapon_id = local_player_active_weapon:get_var_int('CBaseAttributableItem->m_iItemDefinitionIndex') & 65535;
 
-    if local_player_name == nil or local_player_ping == nil or local_player_map_name == nil or local_player_round_kills == nil or local_player_health == nil or local_player_armor == nil or local_player_ammo_clip == nil or local_player_ammo_reserved == nil or local_player_weapon_id == nil then
+    if local_player_ping == nil or local_player_round_kills == nil or local_player_health == nil or local_player_armor == nil or local_player_ammo_clip == nil or local_player_ammo_reserved == nil or local_player_weapon_id == nil then
         return;
     end
 
-    render:rect_fade(0, screen_size.y / 2 + 500, screen_size.x / 2 - 420, screen_size.y / 2 - 500, csgo.color(10, 10, 10, 240), csgo.color(30, 30, 30, 240));
-    render:rect(0, screen_size.y / 2 + 500, screen_size.x / 2 - 420, screen_size.y / 2 - 500, csgo.color(255, 255, 255, 240));
-
-    if string.len(local_player_name) > 14 then
-        local_player_name = string.sub(local_player_name, 0, 14);
-    end
-
-    render:text(create_large_font, screen_size.x / 2 - 945, screen_size.y / 2 + 510, 'Player: '.. local_player_name ..' | Ping: '.. local_player_ping ..' | Round Kills: '.. local_player_round_kills ..' | Current Map: '.. map_name(local_player_map_name) ..'', csgo.color(255, 255, 255, 255));
-    render:rect_fade(screen_size.x / 2 - 275, screen_size.y / 2 + 500, screen_size.x / 2 - 420, screen_size.y / 2 - 500, csgo.color(10, 10, 10, 240), csgo.color(30, 30, 30, 240));
-    render:rect(screen_size.x / 2 - 275, screen_size.y / 2 + 500, screen_size.x / 2 - 420, screen_size.y / 2 - 500, csgo.color(255, 255, 255, 240));
-
-    if local_player_ammo_clip == -1 then
-        render:text(create_large_font, screen_size.x / 2 - 260, screen_size.y / 2 + 510, 'Ammo: Infinite | Current Weapon: '.. weapon_name(local_player_weapon_id) ..'', csgo.color(255, 255, 255, 255));
-    else
-        render:text(create_large_font, screen_size.x / 2 - 260, screen_size.y / 2 + 510, 'Ammo: '.. local_player_ammo_clip ..'/'.. local_player_ammo_reserved ..' | Current Weapon: '.. weapon_name(local_player_weapon_id) ..'', csgo.color(255, 255, 255, 255));
-    end
-
-    render:rect_fade(screen_size.x / 2 + 420, screen_size.y / 2 + 500, screen_size.x / 2 - 420, screen_size.y / 2 - 500, csgo.color(10, 10, 10, 240), csgo.color(30, 30, 30, 240));
-    render:rect(screen_size.x / 2 + 420, screen_size.y / 2 + 500, screen_size.x / 2 - 420, screen_size.y / 2 - 500, csgo.color(255, 255, 255, 240));
-    render:text(create_large_font, screen_size.x / 2 + 435, screen_size.y / 2 + 510, 'Health: '.. local_player_health ..' | Armor: '.. local_player_armor ..'', csgo.color(255, 255, 255, 255));
+    draw_bottom_left_hud(local_player_health, local_player_armor, local_player_round_kills, local_player_ping);
+    draw_bottom_right_hud(weapon_name(local_player_weapon_id), local_player_ammo_clip, local_player_ammo_reserved);
 end
 
-local function draw_crosshair()
+function draw_crosshair()
     render:rect_filled(screen_size.x / 2 - 10, screen_size.y / 2, 20, 1, csgo.color(255, 255, 255, 255));
     render:rect_filled(screen_size.x / 2, screen_size.y / 2 - 10, 1, 20, csgo.color(255, 255, 255, 255));
 end
 
-local function on_paint()
+function on_paint()
     if not engine_client:is_connected() and not engine_client:is_in_game() then
         return;
     end
@@ -336,8 +325,8 @@ local function on_paint()
     end
 end
 
-local function on_events(event)
-    if not engine_client:is_connected() and engine_client:is_in_game() then
+function on_events(event)
+    if not engine_client:is_connected() and not engine_client:is_in_game() then
         return;
     end
 
@@ -391,23 +380,11 @@ local function on_events(event)
     end
 
     if event:get_name() == 'player_disconnect' then
-        client_killed_by_name = {};
-        client_killed_name = {};
-        client_killed_by_weapon = {};
-        client_kill_message_index = 0;
-        client_message_sent_by_name = {};
-        client_message = {};
-        client_message_index = 0;
+        reset_tables();
     end
 
     if event:get_name() == 'round_start' then
-        client_killed_by_name = {};
-        client_killed_name = {};
-        client_killed_by_weapon = {};
-        client_kill_message_index = 0;
-        client_message_sent_by_name = {};
-        client_message = {};
-        client_message_index = 0;
+        reset_tables();
     end
 end
 
