@@ -17,9 +17,6 @@ local create_large_font = render:create_font('Tahoma', 20, 300, true);
 local create_small_font = render:create_font('Tahoma', 12, 300, true);
 local create_icon_font = render:create_font('custom_csgo_icons', 18, 300, true);
 
-local players_name = {};
-local players_index = 0;
-
 local function draw_spectator_list(position_x, position_y, position_w, position_h, index)
     render:rect_filled(position_x + 5, position_y + 2, position_w - 10, position_h - 12 + index * 15, csgo.color(10, 10, 10, 240));
     render:rect(position_x + 5, position_y + 2, position_w - 10, 1, csgo.color(180, 180, 180, 240));
@@ -47,14 +44,21 @@ local function on_paint()
         menu_position_y:set_int(mouse_position.y);
     end
 
+    local players_name = {};
+    local players_index = 0;
+
+    if players_name == nil or players_index == nil then
+        return;
+    end
+
     local local_player = entity_list:get_localplayer();
 
     if local_player == nil then
         return;
     end
 
-    for i = 1, entity_list:get_max_players(), 1 do
-        local player_id = entity_list:get_player(i);
+    for index = 1, entity_list:get_max_players(), 1 do
+        local player_id = entity_list:get_player(index);
 
         if player_id == nil then
             goto continue;
