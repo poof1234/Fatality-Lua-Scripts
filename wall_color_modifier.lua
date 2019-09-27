@@ -19,8 +19,8 @@ local mat_ambient_light_r = cvar:find_var('mat_ambient_light_r');
 local mat_ambient_light_g = cvar:find_var('mat_ambient_light_g');
 local mat_ambient_light_b = cvar:find_var('mat_ambient_light_b');
 
-local function on_paint()
-    if not engine_client:is_connected() and engine_client:is_in_game() then
+function on_paint()
+    if not engine_client:is_connected() and not engine_client:is_in_game() then
         return;
     end
 
