@@ -285,7 +285,6 @@ local function draw_hud()
     local local_player_round_kills = local_player:get_var_int('CCSPlayer->m_iNumRoundKills');
     local local_player_health = local_player:get_var_int('CBasePlayer->m_iHealth');
     local local_player_armor = local_player:get_var_int('CCSPlayer->m_ArmorValue');
-    local local_player_is_scoped = local_player:get_var_bool('CCSPlayer->m_bIsScoped');
     local local_player_weapon_handle = local_player:get_var_handle('CBaseCombatCharacter->m_hActiveWeapon');
     local local_player_active_weapon = entity_list:get_from_handle(local_player_weapon_handle);
 
@@ -297,16 +296,12 @@ local function draw_hud()
     local local_player_ammo_reserved = local_player_active_weapon:get_var_int('CBaseCombatWeapon->m_iPrimaryReserveAmmoCount');
     local local_player_weapon_id = local_player_active_weapon:get_var_int('CBaseAttributableItem->m_iItemDefinitionIndex') & 65535;
 
-    if local_player_ping == nil or local_player_round_kills == nil or local_player_health == nil or local_player_armor == nil or local_player_is_scoped == nil or local_player_ammo_clip == nil or local_player_ammo_reserved == nil or local_player_weapon_id == nil then
+    if local_player_ping == nil or local_player_round_kills == nil or local_player_health == nil or local_player_armor == nil or local_player_ammo_clip == nil or local_player_ammo_reserved == nil or local_player_weapon_id == nil then
         return;
     end
 
     draw_bottom_left_hud(local_player_health, local_player_armor, local_player_round_kills, local_player_ping);
     draw_bottom_right_hud(weapon_name(local_player_weapon_id), local_player_ammo_clip, local_player_ammo_reserved);
-
-    if local_player_is_scoped then
-        draw_scope_lines();
-    end
 end
 
 local function draw_crosshair()
@@ -322,12 +317,28 @@ local function on_paint()
     local draw_hud_cvar = cvar:find_var('cl_drawhud');
     local crosshair_cvar = cvar:find_var('crosshair');
 
+    local local_player = entity_list:get_localplayer(); 
+
+    if local_player == nil then
+        return;
+    end
+
+    local local_player_is_scoped = local_player:get_var_bool('CCSPlayer->m_bIsScoped');
+
+    if local_player_is_scoped == nil then
+        return;
+    end
+
     if custom_ui_item:get_bool() then
         draw_hud_cvar:set_int(0);
         crosshair_cvar:set_int(0);
 
-        draw_hud();
-        draw_crosshair();
+        if local_player_is_scoped then
+            draw_scope_lines();
+        else
+            draw_hud();
+            draw_crosshair();
+        end
     else
         draw_hud_cvar:set_int(1);
         crosshair_cvar:set_int(1);
