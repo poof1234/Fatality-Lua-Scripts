@@ -3,7 +3,7 @@ local menu = fatality.menu;
 local render = fatality.render;
 local callbacks = fatality.callbacks;
 
-local custom_hud_item = config:add_item('visuals_custom_ui', 0);
+local custom_hud_item = config:add_item('visuals_custom_hud', 0);
 local custom_hud_checkbox = menu:add_checkbox('Custom Hud', 'Visuals', 'Misc', 'Various', custom_hud_item);
 
 local engine_client = csgo.interface_handler:get_engine_client();
