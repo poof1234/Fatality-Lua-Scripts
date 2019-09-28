@@ -329,7 +329,7 @@ local function on_paint()
         return;
     end
 
-    if custom_ui_item:get_bool() then
+    if custom_hud_item:get_bool() then
         draw_hud_cvar:set_int(0);
         crosshair_cvar:set_int(0);
 
