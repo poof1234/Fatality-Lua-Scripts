@@ -29,7 +29,7 @@ local client_killed_by_weapon = {};
 local client_message_index = 0;
 local client_kill_message_index = 0;
 
-local function reset_fields()
+local function reset_fields() -- improve this later
     client_killed_by_name = {};
     client_killed_name = {};
     client_killed_by_weapon = {};
