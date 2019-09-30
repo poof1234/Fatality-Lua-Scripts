@@ -35,6 +35,10 @@ local function draw_spectator_list(position_x, position_y)
     local PLAYER = {};
     local INDEX = 0;
 
+    if PLAYER == nil or INDEX == nil then
+        return;
+    end
+
     local LOCAL_PLAYER = entity_list:get_localplayer();
 
     if LOCAL_PLAYER == nil then
