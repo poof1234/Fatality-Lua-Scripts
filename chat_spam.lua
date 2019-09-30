@@ -7,16 +7,15 @@ local chat_spam_checkbox = menu:add_checkbox('Chat Spam', 'Visuals', 'Misc', 'Va
 
 local engine_client = csgo.interface_handler:get_engine_client();
 local entity_list = csgo.interface_handler:get_entity_list();
-local cvar = csgo.interface_handler:get_cvar();
 local events = csgo.interface_handler:get_events();
 
-local event_player_death = events:add_event('player_death');
-local event_bomb_dropped = events:add_event('bomb_dropped');
-local event_bomb_begin_plant = events:add_event('bomb_beginplant');
-local event_bomb_planted = events:add_event('bomb_planted');
-local event_bomb_begin_defuse = events:add_event('bomb_begindefuse');
-local event_bomb_abort_defuse = events:add_event('bomb_abortdefuse');
-local event_bomb_defused = events:add_event('bomb_defused');
+local add_player_death_avent = events:add_event('player_death');
+local add_bomb_dropped_event = events:add_event('bomb_dropped');
+local add_bomb_begin_plant_event = events:add_event('bomb_beginplant');
+local add_bomb_planted_event = events:add_event('bomb_planted');
+local add_bomb_begin_defuse_event = events:add_event('bomb_begindefuse');
+local add_bomb_abort_defuse_event = events:add_event('bomb_abortdefuse');
+local add_bomb_defused_event = events:add_event('bomb_defused');
 
 local function on_events(event)
     if not chat_spam_item:get_bool() then
@@ -28,144 +27,144 @@ local function on_events(event)
     end
 
     if event:get_name() == 'player_death' then
-        local event_user_id = event:get_int('userid');
-        local event_attacker = event:get_int('attacker');
-        local event_weapon = event:get_string('weapon');
-        local event_headshot = event:get_bool('headshot');
+        local EVENT_USER_ID = event:get_int('userid');
+        local EVENT_ATTACKER = event:get_int('attacker');
+        local EVENT_WEAPON = event:get_string('weapon');
+        local EVENT_HEADSHOT = event:get_bool('headshot');
 
-        local local_player = entity_list:get_localplayer();
-        local user_id = entity_list:get_player_from_id(event_user_id);
-        local attacker = entity_list:get_player_from_id(event_attacker);
+        local LOCAL_PLAYER = entity_list:get_localplayer();
+        local USER_ID = entity_list:get_player_from_id(EVENT_USER_ID);
+        local ATTACKER = entity_list:get_player_from_id(EVENT_ATTACKER);
 
-        if local_player == nil or user_id == nil or attacker == nil or event_headshot == nil then
+        if EVENT_WEAPON == nil or EVENT_HEADSHOT == nil or LOCAL_PLAYER == nil or USER_ID == nil or ATTACKER == nil then
             return;
         end
 
-        local player_name = user_id:get_name();
+        local PLAYER_NAME = USER_ID:get_name();
 
-        if player_name == nil then
+        if PLAYER_NAME == nil then
             return;
         end
 
-        if not attacker:get_index() == local_player:get_index() then
+        if not ATTACKER:get_index() == ATTACKER:get_index() then
             return;
         end
 
-        if attacker:get_index() == local_player:get_index() then
-            if event_headshot then
-                engine_client:client_cmd('say '.. player_name ..' just died by a headshot to my '.. event_weapon ..'!');
+        if ATTACKER:get_index() == LOCAL_PLAYER:get_index() then
+            if EVENT_HEADSHOT then
+                engine_client:client_cmd('say '.. PLAYER_NAME ..' just died by a headshot to my '.. EVENT_WEAPON ..'!');
             else
-                engine_client:client_cmd('say '.. player_name ..' just died to my '.. event_weapon ..'!');
+                engine_client:client_cmd('say '.. PLAYER_NAME ..' just died to my '.. EVENT_WEAPON ..'!');
             end
         end
     end
 
     if event:get_name() == 'bomb_dropped' then
-        local event_user_id = event:get_int('userid');
+        local EVENT_USER_ID = event:get_int('userid');
 
-        local user_id = entity_list:get_player_from_id(event_user_id);
+        local USER_ID = entity_list:get_player_from_id(EVENT_USER_ID);
 
-        if user_id == nil then
+        if USER_ID == nil then
             return;
         end
 
-        local player_name = user_id:get_name();
+        local PLAYER_NAME = USER_ID:get_name();
 
-        if player_name == nil then
+        if PLAYER_NAME == nil then
             return;
         end
 
-        engine_client:client_cmd('say '.. player_name ..' has dropped the bomb!');
+        engine_client:client_cmd('say '.. PLAYER_NAME ..' has dropped the bomb!');
     end
 
     if event:get_name() == 'bomb_beginplant' then
-        local event_user_id = event:get_int('userid');
+        local EVENT_USER_ID = event:get_int('userid');
 
-        local user_id = entity_list:get_player_from_id(event_user_id);
+        local USER_ID = entity_list:get_player_from_id(EVENT_USER_ID);
 
-        if user_id == nil then
+        if USER_ID == nil then
             return;
         end
 
-        local player_name = user_id:get_name();
+        local PLAYER_NAME = USER_ID:get_name();
 
-        if player_name == nil then
+        if PLAYER_NAME == nil then
             return;
         end
 
-        engine_client:client_cmd('say '.. player_name ..' has begun to plant the bomb!');
+        engine_client:client_cmd('say '.. PLAYER_NAME ..' has begun to plant the bomb!');
     end
 
     if event:get_name() == 'bomb_planted' then
-        local event_user_id = event:get_int('userid');
+        local EVENT_USER_ID = event:get_int('userid');
 
-        local user_id = entity_list:get_player_from_id(event_user_id);
+        local USER_ID = entity_list:get_player_from_id(EVENT_USER_ID);
 
-        if user_id == nil then
+        if USER_ID == nil then
             return;
         end
 
-        local player_name = user_id:get_name();
+        local PLAYER_NAME = USER_ID:get_name();
 
-        if player_name == nil then
+        if PLAYER_NAME == nil then
             return;
         end
 
-        engine_client:client_cmd('say '.. player_name ..' has planted the bomb!');
+        engine_client:client_cmd('say '.. PLAYER_NAME ..' has planted the bomb!');
     end
 
     if event:get_name() == 'bomb_begindefuse' then
-        local event_user_id = event:get_int('userid');
+        local EVENT_USER_ID = event:get_int('userid');
 
-        local user_id = entity_list:get_player_from_id(event_user_id);
+        local USER_ID = entity_list:get_player_from_id(EVENT_USER_ID);
 
-        if user_id == nil then
+        if USER_ID == nil then
             return;
         end
 
-        local player_name = user_id:get_name();
+        local PLAYER_NAME = USER_ID:get_name();
 
-        if player_name == nil then
+        if PLAYER_NAME == nil then
             return;
         end
 
-        engine_client:client_cmd('say '.. player_name ..' has began to defuse the bomb!');
+        engine_client:client_cmd('say '.. PLAYER_NAME ..' has began to defuse the bomb!');
     end
 
     if event:get_name() == 'bomb_abortdefuse' then
-        local event_user_id = event:get_int('userid');
+        local EVENT_USER_ID = event:get_int('userid');
 
-        local user_id = entity_list:get_player_from_id(event_user_id);
+        local USER_ID = entity_list:get_player_from_id(EVENT_USER_ID);
 
-        if user_id == nil then
+        if USER_ID == nil then
             return;
         end
 
-        local player_name = user_id:get_name();
+        local PLAYER_NAME = USER_ID:get_name();
 
-        if player_name == nil then
+        if PLAYER_NAME == nil then
             return;
         end
 
-        engine_client:client_cmd('say '.. player_name ..' has aborted defusing the bomb!');
+        engine_client:client_cmd('say '.. PLAYER_NAME ..' has aborted defusing the bomb!');
     end
 
     if event:get_name() == 'bomb_defused' then
-        local event_user_id = event:get_int('userid');
+        local EVENT_USER_ID = event:get_int('userid');
 
-        local user_id = entity_list:get_player_from_id(event_user_id);
+        local USER_ID = entity_list:get_player_from_id(EVENT_USER_ID);
 
-        if user_id == nil then
+        if USER_ID == nil then
             return;
         end
 
-        local player_name = user_id:get_name();
+        local PLAYER_NAME = USER_ID:get_name();
 
-        if player_name == nil then
+        if PLAYER_NAME == nil then
             return;
         end
 
-        engine_client:client_cmd('say '.. player_name ..' has defused the bomb!');
+        engine_client:client_cmd('say '.. PLAYER_NAME ..' has defused the bomb!');
     end
 end
 
